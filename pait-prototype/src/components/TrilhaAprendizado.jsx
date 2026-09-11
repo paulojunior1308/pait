@@ -1,8 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   CheckCircle2,
   Circle,
-  Lock,
   Clock,
   X,
   Calendar,
@@ -10,167 +9,29 @@ import {
   BookOpen,
   PlayCircle,
   ChevronRight,
+  RotateCcw,
 } from 'lucide-react'
-
-const modules = [
-  {
-    id: 1,
-    title: 'Onboarding Cultural & Compliance',
-    status: 'done',
-    duration: '45 min',
-    tourId: 'howto-mod-done',
-    completedAt: '01 set 2026',
-    score: '100%',
-    summary:
-      'Você concluiu a introdução à cultura da empresa, código de conduta e políticas básicas de compliance.',
-    activities: [
-      { label: 'Vídeo: Cultura e valores PAIT Corp', done: true },
-      { label: 'Leitura: Código de Conduta v2.1', done: true },
-      { label: 'Quiz de compliance (8/8)', done: true },
-      { label: 'Aceite digital das políticas', done: true },
-    ],
-    takeaways: [
-      'Canal confidencial para denúncias',
-      'Regras de uso de dados e dispositivos',
-      'Expectativas de comunicação na squad',
-    ],
-  },
-  {
-    id: 2,
-    title: 'Setup do Ambiente de Desenvolvimento',
-    status: 'done',
-    duration: '1h30',
-    completedAt: '02 set 2026',
-    score: '100%',
-    summary:
-      'Ambiente local configurado com as ferramentas padrão da squad de Pagamentos.',
-    activities: [
-      { label: 'Instalação do Git e Node LTS', done: true },
-      { label: 'Clone do repositório payments-core', done: true },
-      { label: 'Configuração de .env e VPN', done: true },
-      { label: 'Primeiro run local validado pelo buddy', done: true },
-    ],
-    takeaways: [
-      'Checklist de setup no Confluence',
-      'Credenciais via cofre interno',
-      'Padrão de branches da squad',
-    ],
-  },
-  {
-    id: 3,
-    title: 'Ferramentas do Time (Jira, Slack, Git)',
-    status: 'done',
-    duration: '40 min',
-    completedAt: '02 set 2026',
-    score: '95%',
-    summary:
-      'Você aprendeu o fluxo diário de comunicação, cards e versionamento usados pela squad.',
-    activities: [
-      { label: 'Canais Slack da squad e do capítulo', done: true },
-      { label: 'Criar e mover cards no Jira', done: true },
-      { label: 'Convenção de commits e PRs', done: true },
-      { label: 'Exercício: abrir PR de exemplo', done: true },
-    ],
-    takeaways: [
-      'Prefixo de branch: feature/PAY-xxx',
-      'Revisor obrigatório antes do merge',
-      'Stand-up e docs no #squad-pagamentos',
-    ],
-  },
-  {
-    id: 4,
-    title: 'Arquitetura de Sistemas Internos',
-    status: 'progress',
-    progress: 60,
-    duration: '2h',
-    badge: 'recommended',
-    tourId: 'howto-mod-arch',
-    summary:
-      'Visão dos microsserviços de pagamentos, filas e contratos entre APIs.',
-    activities: [
-      { label: 'Mapa de serviços (diagrama C4)', done: true },
-      { label: 'Fluxo de autorização e cobrança', done: true },
-      { label: 'Contratos de API e versionamento', done: true },
-      { label: 'Laboratório: rastrear uma transação', done: false },
-      { label: 'Quiz de arquitetura', done: false },
-    ],
-    takeaways: [
-      'Próximo: lab de rastreamento end-to-end',
-      'Documentação no Manual de Arquitetura v4',
-    ],
-  },
-  {
-    id: 5,
-    title: 'Processo de Deploy (CI/CD)',
-    status: 'progress',
-    progress: 40,
-    duration: '1h15',
-    tourId: 'howto-mod-deploy',
-    summary:
-      'Pipeline de PR → CI → homologação automática → validação em staging.',
-    activities: [
-      { label: 'Visão geral do pipeline', done: true },
-      { label: 'Checks de lint e testes', done: true },
-      { label: 'Deploy para homologação', done: false },
-      { label: 'Checklist pré-produção', done: false },
-    ],
-    takeaways: [
-      'Merge em develop dispara staging',
-      'Validar URL de homolog antes de prod',
-    ],
-  },
-  {
-    id: 6,
-    title: 'LGPD e Proteção de Dados para Devs',
-    status: 'pending',
-    duration: '50 min',
-    badge: 'priority',
-    tourId: 'howto-mod-lgpd',
-    summary:
-      'Boas práticas de privacidade no código, logs e migrations — prioridade alta para a squad.',
-    activities: [
-      { label: 'Princípios da LGPD para engenharia', done: false },
-      { label: 'PII em logs e mascaramento', done: false },
-      { label: 'Review de Compliance em migrations', done: false },
-    ],
-    takeaways: ['Ainda não iniciado — estimado em 50 min'],
-  },
-  {
-    id: 7,
-    title: 'Boas Práticas de Código & Segurança',
-    status: 'locked',
-    duration: '1h45',
-    requires: 'Arquitetura de Sistemas Internos',
-    tourId: 'howto-mod-locked',
-    summary:
-      'Padrões de código seguro, secrets e revisão de vulnerabilidades.',
-    activities: [
-      { label: 'OWASP top risks no contexto interno', done: false },
-      { label: 'Gestão de secrets e least privilege', done: false },
-      { label: 'Code review com checklist de segurança', done: false },
-    ],
-    takeaways: ['Desbloqueia ao concluir Arquitetura de Sistemas Internos'],
-  },
-]
 
 function StatusIcon({ status }) {
   if (status === 'done') {
     return <CheckCircle2 className="h-6 w-6 text-success" />
   }
-  if (status === 'progress' || status === 'pending') {
-    return <Circle className="h-6 w-6 text-accent-blue" strokeWidth={2.5} />
-  }
-  return <Lock className="h-6 w-6 text-[#98A2B3]" />
+  return <Circle className="h-6 w-6 text-accent-blue" strokeWidth={2.5} />
 }
 
 function statusLabel(status) {
   if (status === 'done') return 'Concluído'
   if (status === 'progress') return 'Em andamento'
-  if (status === 'pending') return 'Pendente'
-  return 'Bloqueado'
+  return 'Pendente'
 }
 
-export default function TrilhaAprendizado() {
+export default function TrilhaAprendizado({
+  externalModules = [],
+  onStartHowTo,
+  progressPercent = 0,
+  completedCount = 0,
+  totalCount = 3,
+}) {
   const [selected, setSelected] = useState(null)
 
   return (
@@ -181,88 +42,115 @@ export default function TrilhaAprendizado() {
       >
         <div>
           <h2 className="font-sora text-xl font-700">
-            Trilha personalizada — Desenvolvedor de Software
+            Trilha prática — Sistemas do dia a dia
           </h2>
           <p className="mt-1.5 max-w-xl text-sm text-white/70">
-            Adaptada por perfil, senioridade e squad. Clique em um módulo para ver o conteúdo e o
-            que você já fez.
+            3 treinamentos guiados: Gmail, GitHub e Jira Service Management. Peça ajuda no Tutor ou
+            inicie por aqui — depois você pode refazer.
+          </p>
+          <p className="mt-3 text-xs text-white/55">
+            {completedCount} de {totalCount} cursos concluídos
           </p>
         </div>
         <div className="shrink-0 text-right">
-          <p className="font-sora text-4xl font-800 tracking-tight">68%</p>
+          <p className="font-sora text-4xl font-800 tracking-tight">{progressPercent}%</p>
           <p className="mt-0.5 text-sm text-white/60">concluído</p>
         </div>
       </div>
 
-      <div className="space-y-3">
-        {modules.map((mod) => (
-          <button
+      <section className="space-y-3">
+        {externalModules.map((mod) => (
+          <ModuleCard
             key={mod.id}
-            type="button"
-            data-tour={mod.tourId}
+            mod={mod}
+            selected={selected?.id === mod.id}
             onClick={() => setSelected(mod)}
-            className={`flex w-full items-center gap-4 rounded-2xl border border-border bg-white px-5 py-4 text-left shadow-sm transition-all hover:border-accent-cyan/40 hover:shadow-md ${
-              mod.status === 'locked' ? 'opacity-70' : ''
-            } ${selected?.id === mod.id ? 'ring-2 ring-accent-cyan/30' : ''}`}
-          >
-            <StatusIcon status={mod.status} />
-
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="font-sora text-sm font-600 text-ink">{mod.title}</h3>
-                {mod.badge === 'recommended' && (
-                  <span className="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-[11px] font-semibold text-accent-blue">
-                    Recomendado agora
-                  </span>
-                )}
-                {mod.badge === 'priority' && (
-                  <span className="rounded-full bg-[#FFFAEB] px-2.5 py-0.5 text-[11px] font-semibold text-warning">
-                    Prioridade alta
-                  </span>
-                )}
-                {mod.status === 'done' && (
-                  <span className="rounded-full bg-[#ECFDF3] px-2.5 py-0.5 text-[11px] font-semibold text-success">
-                    Ver o que fiz
-                  </span>
-                )}
-              </div>
-
-              {mod.status === 'progress' && (
-                <div className="mt-2.5 flex items-center gap-3">
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#E4E7EC]">
-                    <div
-                      className="bg-gradient-accent h-full rounded-full transition-all"
-                      style={{ width: `${mod.progress}%` }}
-                    />
-                  </div>
-                  <span className="text-xs font-semibold text-ink-muted">{mod.progress}%</span>
-                </div>
-              )}
-
-              {mod.status === 'locked' && (
-                <p className="mt-1 text-xs text-ink-muted">Requer: {mod.requires}</p>
-              )}
-            </div>
-
-            <div className="flex shrink-0 items-center gap-3 text-xs text-ink-muted">
-              <span className="flex items-center gap-1.5">
-                <Clock size={14} />
-                {mod.duration}
-              </span>
-              <ChevronRight size={16} className="text-ink-muted" />
-            </div>
-          </button>
+          />
         ))}
-      </div>
+      </section>
 
       {selected && (
-        <ModuleDetail mod={selected} onClose={() => setSelected(null)} />
+        <ModuleDetail
+          mod={selected}
+          onClose={() => setSelected(null)}
+          onStartHowTo={onStartHowTo}
+        />
       )}
     </div>
   )
 }
 
-function ModuleDetail({ mod, onClose }) {
+function ModuleCard({ mod, selected, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex w-full items-center gap-4 rounded-2xl border border-border border-l-4 border-l-accent-cyan bg-white px-5 py-4 text-left shadow-sm transition-all hover:border-accent-cyan/40 hover:shadow-md ${
+        selected ? 'ring-2 ring-accent-cyan/30' : ''
+      }`}
+    >
+      <StatusIcon status={mod.status} />
+
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="font-sora text-sm font-600 text-ink">{mod.title}</h3>
+          <span className="rounded-full bg-navy px-2 py-0.5 text-[10px] font-semibold text-white">
+            {mod.system}
+          </span>
+          {mod.status === 'progress' && (
+            <span className="rounded-full bg-[#EFF6FF] px-2.5 py-0.5 text-[11px] font-semibold text-accent-blue">
+              Em andamento
+            </span>
+          )}
+          {mod.status === 'pending' && (
+            <span className="rounded-full bg-[#ECFEFF] px-2.5 py-0.5 text-[11px] font-semibold text-accent-cyan">
+              Pendente
+            </span>
+          )}
+          {mod.status === 'done' && (
+            <span className="rounded-full bg-[#ECFDF3] px-2.5 py-0.5 text-[11px] font-semibold text-success">
+              Refazer treinamento
+            </span>
+          )}
+        </div>
+
+        {mod.status === 'progress' && (
+          <div className="mt-2.5 flex items-center gap-3">
+            <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#E4E7EC]">
+              <div
+                className="bg-gradient-accent h-full rounded-full transition-all"
+                style={{ width: `${mod.progress || 50}%` }}
+              />
+            </div>
+            <span className="text-xs font-semibold text-ink-muted">{mod.progress || 50}%</span>
+          </div>
+        )}
+
+        {mod.timesCompleted > 1 && (
+          <p className="mt-1 text-xs text-ink-muted">Concluído {mod.timesCompleted}x</p>
+        )}
+      </div>
+
+      <div className="flex shrink-0 items-center gap-3 text-xs text-ink-muted">
+        <span className="flex items-center gap-1.5">
+          <Clock size={14} />
+          {mod.duration}
+        </span>
+        <ChevronRight size={16} />
+      </div>
+    </button>
+  )
+}
+
+function ModuleDetail({ mod, onClose, onStartHowTo }) {
+  useEffect(() => {}, [mod.id])
+
+  const launchExternal = () => {
+    if (!mod.howtoId || !onStartHowTo) return
+    onClose()
+    onStartHowTo(mod.howtoId)
+  }
+
   const doneCount = mod.activities.filter((a) => a.done).length
 
   return (
@@ -282,12 +170,13 @@ function ModuleDetail({ mod, onClose }) {
                 className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
                   mod.status === 'done'
                     ? 'bg-[#ECFDF3] text-success'
-                    : mod.status === 'locked'
-                      ? 'bg-[#F2F4F7] text-ink-muted'
-                      : 'bg-[#EFF6FF] text-accent-blue'
+                    : 'bg-[#EFF6FF] text-accent-blue'
                 }`}
               >
                 {statusLabel(mod.status)}
+              </span>
+              <span className="rounded-full bg-navy px-2 py-0.5 text-[10px] font-semibold text-white">
+                {mod.system}
               </span>
             </div>
             <h2 className="font-sora text-lg font-700 text-ink">{mod.title}</h2>
@@ -313,7 +202,7 @@ function ModuleDetail({ mod, onClose }) {
           {mod.status === 'progress' && (
             <div>
               <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="font-medium text-ink">Progresso do módulo</span>
+                <span className="font-medium text-ink">Progresso do treinamento</span>
                 <span className="font-semibold text-accent-blue">{mod.progress}%</span>
               </div>
               <div className="h-2.5 overflow-hidden rounded-full bg-[#E4E7EC]">
@@ -325,18 +214,11 @@ function ModuleDetail({ mod, onClose }) {
             </div>
           )}
 
-          {mod.status === 'locked' && (
-            <div className="rounded-xl border border-[#E4E7EC] bg-surface px-4 py-3 text-sm text-ink-muted">
-              Este módulo está bloqueado. Conclua <strong className="text-ink">{mod.requires}</strong>{' '}
-              para liberar o conteúdo.
-            </div>
-          )}
-
           <div>
             <div className="mb-3 flex items-center justify-between">
               <h3 className="flex items-center gap-2 font-sora text-sm font-700 text-ink">
                 <BookOpen size={16} className="text-accent-blue" />
-                {mod.status === 'done' ? 'O que você fez' : 'Atividades do módulo'}
+                {mod.status === 'done' ? 'O que você fez' : 'Passos do treinamento'}
               </h3>
               <span className="text-xs text-ink-muted">
                 {doneCount}/{mod.activities.length}
@@ -365,7 +247,7 @@ function ModuleDetail({ mod, onClose }) {
 
           <div>
             <h3 className="mb-3 font-sora text-sm font-700 text-ink">
-              {mod.status === 'done' ? 'Principais aprendizados' : 'Destaques'}
+              {mod.status === 'done' ? 'Principais aprendizados' : 'O que você vai aprender'}
             </h3>
             <ul className="space-y-2">
               {mod.takeaways.map((t) => (
@@ -382,31 +264,46 @@ function ModuleDetail({ mod, onClose }) {
         </div>
 
         <div className="border-t border-border px-6 py-4">
-          {mod.status === 'done' ? (
+          {mod.status === 'pending' && (
             <button
               type="button"
-              onClick={onClose}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-white py-2.5 text-sm font-semibold text-ink hover:bg-surface"
-            >
-              Fechar revisão
-            </button>
-          ) : mod.status === 'locked' ? (
-            <button
-              type="button"
-              disabled
-              className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-[#F2F4F7] py-2.5 text-sm font-semibold text-ink-muted"
-            >
-              <Lock size={16} />
-              Módulo bloqueado
-            </button>
-          ) : (
-            <button
-              type="button"
+              onClick={launchExternal}
               className="bg-gradient-accent flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white shadow-sm"
             >
               <PlayCircle size={16} />
-              {mod.status === 'pending' ? 'Iniciar módulo' : 'Continuar de onde parei'}
+              Iniciar treinamento guiado
             </button>
+          )}
+
+          {mod.status === 'progress' && (
+            <button
+              type="button"
+              onClick={launchExternal}
+              className="bg-gradient-accent flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white shadow-sm"
+            >
+              <PlayCircle size={16} />
+              Continuar tutorial guiado
+            </button>
+          )}
+
+          {mod.status === 'done' && (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-white py-2.5 text-sm font-semibold text-ink hover:bg-surface"
+              >
+                Fechar
+              </button>
+              <button
+                type="button"
+                onClick={launchExternal}
+                className="bg-gradient-accent flex flex-[1.4] items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-semibold text-white shadow-sm"
+              >
+                <RotateCcw size={16} />
+                Refazer treinamento
+              </button>
+            </div>
           )}
         </div>
       </aside>

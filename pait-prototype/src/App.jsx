@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+﻿import { useState, useCallback } from 'react'
 import Login from './components/Login'
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
@@ -12,6 +12,15 @@ import GitHubMock from './components/GitHubMock'
 import JiraServiceMock from './components/JiraServiceMock'
 import MascotGuide, { ONBOARDING_STEPS } from './components/MascotGuide'
 import { HOW_TO_TUTORIALS } from './data/howToTutorials'
+import {
+  createEmptyTrainingProgress,
+  unlockTraining,
+  completeTraining,
+  toTrailModule,
+  TRAINING_IDS,
+  getTrainingStats,
+  getNextTraining,
+} from './data/externalTrainings'
 import mascot from './assets/pait-mascot-fullbody.png'
 
 const EXTERNAL_TUTORIALS = {
@@ -25,6 +34,7 @@ export default function App() {
   const [activeScreen, setActiveScreen] = useState('inicio')
   const [guide, setGuide] = useState(null)
   const [externalPhase, setExternalPhase] = useState(0)
+  const [trainingProgress, setTrainingProgress] = useState(createEmptyTrainingProgress)
 
   const onNavigate = useCallback((screen) => {
     setActiveScreen(screen)
@@ -32,14 +42,23 @@ export default function App() {
 
   const startHowTo = useCallback((howtoId) => {
     if (!HOW_TO_TUTORIALS[howtoId]) return
-    if (EXTERNAL_TUTORIALS[howtoId]) setExternalPhase(0)
+    if (EXTERNAL_TUTORIALS[howtoId]) {
+      setExternalPhase(0)
+      setTrainingProgress((prev) => unlockTraining(prev, howtoId))
+    }
     setGuide({ mode: 'howto', id: howtoId })
   }, [])
 
   const finishGuide = useCallback(() => {
+    if (guide?.mode === 'howto' && EXTERNAL_TUTORIALS[guide.id]) {
+      setTrainingProgress((prev) => completeTraining(prev, guide.id))
+      setGuide(null)
+      setActiveScreen('trilha')
+      return
+    }
     setGuide(null)
     setActiveScreen('inicio')
-  }, [])
+  }, [guide])
 
   const onStepChange = useCallback(
     (stepIndex) => {
@@ -67,10 +86,17 @@ export default function App() {
       : null
 
   const finishLabel = isExternal
-    ? 'Concluir tutorial'
+    ? 'Concluir treinamento'
     : guide?.mode === 'howto'
       ? 'Entendi!'
       : 'Começar'
+
+  const externalModules = TRAINING_IDS.map((id) =>
+    toTrailModule(id, trainingProgress[id]),
+  ).filter(Boolean)
+
+  const trainingStats = getTrainingStats(trainingProgress)
+  const nextTraining = getNextTraining(trainingProgress)
 
   if (!authenticated) {
     return (
@@ -90,16 +116,33 @@ export default function App() {
         <main className="flex-1 overflow-hidden">
           <div className="h-[calc(100vh-89px)] overflow-y-auto">
             <div className={activeScreen === 'inicio' ? 'block' : 'hidden'}>
-              <InicioDashboard onNavigate={setActiveScreen} />
+              <InicioDashboard
+                onNavigate={setActiveScreen}
+                progressPercent={trainingStats.percent}
+                completedCount={trainingStats.done}
+                totalCount={trainingStats.total}
+                nextTraining={nextTraining}
+              />
             </div>
             <div className={activeScreen === 'tutor' ? 'h-full' : 'hidden'}>
               <TutorIA onStartHowTo={startHowTo} />
             </div>
             <div className={activeScreen === 'trilha' ? 'block' : 'hidden'}>
-              <TrilhaAprendizado />
+              <TrilhaAprendizado
+                externalModules={externalModules}
+                onStartHowTo={startHowTo}
+                progressPercent={trainingStats.percent}
+                completedCount={trainingStats.done}
+                totalCount={trainingStats.total}
+              />
             </div>
             <div className={activeScreen === 'progresso' ? 'block' : 'hidden'}>
-              <MeuProgresso />
+              <MeuProgresso
+                trainingProgress={trainingProgress}
+                trainingStats={trainingStats}
+                nextTraining={nextTraining}
+                onNavigate={setActiveScreen}
+              />
             </div>
             <div className={activeScreen === 'rh' ? 'block' : 'hidden'}>
               <PainelRH />
@@ -140,7 +183,7 @@ export default function App() {
           aria-label="Reabrir tour do PAIT"
         >
           <span className="tour-bubble-peek mb-4 hidden max-w-[260px] rounded-2xl rounded-br-md border border-border bg-white px-3 py-2 text-xs font-medium text-ink shadow-lg group-hover:block">
-            Pergunte: Gmail, GitHub, Jira, deploy…
+            Pergunte: Gmail, GitHub, Jira…
           </span>
           <img
             src={mascot}

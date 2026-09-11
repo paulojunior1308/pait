@@ -241,7 +241,7 @@ export const HOW_TO_TUTORIALS = {
     id: 'gmail',
     label: 'Criar pastas no Gmail',
     chatReply:
-      'Beleza! Vou abrir uma simulação do Gmail e te guiar passo a passo — como no tutorial de criar marcadores (pastas) e mover e-mails. No Gmail, “pasta” = marcador.',
+      'Beleza! Vou abrir uma simulação do Gmail e te guiar passo a passo. Esse treinamento também entra na sua Trilha de Aprendizado — depois você pode revisar ou refazer por lá.',
     steps: [
       {
         target: 'gmail-inbox',
@@ -299,7 +299,7 @@ export const HOW_TO_TUTORIALS = {
     id: 'github',
     label: 'Criar repositório no GitHub',
     chatReply:
-      'Perfeito! Vou abrir uma simulação do GitHub e te mostrar como criar um repositório do zero — nome, descrição, público/privado e o README. Depois você conecta com git push.',
+      'Perfeito! Vou abrir uma simulação do GitHub e te mostrar como criar um repositório. O treinamento vai aparecer na sua Trilha — concluindo, você pode refazer quando quiser.',
     steps: [
       {
         target: 'gh-dashboard',
@@ -350,7 +350,7 @@ export const HOW_TO_TUTORIALS = {
     id: 'jira',
     label: 'Abrir chamado no Jira Service Management',
     chatReply:
-      'Boa! Vou abrir o portal do cliente no Jira Service Management e te guiar: escolher categoria, tipo de solicitação, preencher o formulário e ver as notificações — como no vídeo do portal.',
+      'Boa! Vou abrir o portal do Jira Service Management e te guiar. Esse treinamento entra na sua Trilha de Aprendizado para você acompanhar e refazer depois.',
     steps: [
       {
         target: 'jsm-home',

@@ -13,7 +13,7 @@ const screenMeta = {
   },
   progresso: {
     title: 'Meu Progresso',
-    subtitle: 'Acompanhe sua evolução e as lacunas identificadas pela IA',
+    subtitle: 'Acompanhe a evolução real nos treinamentos Gmail, GitHub e Jira',
   },
   rh: {
     title: 'Painel RH',
