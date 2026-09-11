@@ -1,4 +1,4 @@
-import { Home, MessageSquare, Route, BarChart3, Users } from 'lucide-react'
+import { Home, MessageSquare, Route, BarChart3, Users, LogOut } from 'lucide-react'
 import paitMascot from '../assets/pait-mascot.png'
 
 const mainNav = [
@@ -12,7 +12,7 @@ const leadershipNav = [
   { id: 'rh', label: 'Painel RH', icon: Users },
 ]
 
-export default function Sidebar({ activeScreen, onNavigate }) {
+export default function Sidebar({ activeScreen, onNavigate, onLogout }) {
   return (
     <aside className="fixed left-0 top-0 z-20 flex h-full w-sidebar flex-col bg-navy text-white">
       <div className="px-5 pb-6 pt-7">
@@ -92,11 +92,19 @@ export default function Sidebar({ activeScreen, onNavigate }) {
           <div className="bg-gradient-accent flex h-9 w-9 items-center justify-center rounded-full font-sora text-sm font-700 text-white">
             L
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-white">Lucas Ferreira</p>
             <p className="truncate text-xs text-white/50">Dev · Squad Pagamentos</p>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={onLogout}
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white"
+        >
+          <LogOut size={16} />
+          Sair da conta
+        </button>
       </div>
     </aside>
   )

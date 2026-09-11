@@ -140,12 +140,6 @@ export default function Login({ onSuccess }) {
               {loading ? 'Entrando…' : 'Entrar no PAIT'}
               {!loading && <ArrowRight size={16} />}
             </button>
-
-            <p className="mt-4 text-center text-[11px] text-ink-muted">
-              Demo · usuário{' '}
-              <span className="font-semibold text-ink">lucas.ferreira</span> · senha{' '}
-              <span className="font-semibold text-ink">Teste123</span>
-            </p>
           </form>
         </div>
       </div>

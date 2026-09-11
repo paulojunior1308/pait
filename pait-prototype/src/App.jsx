@@ -40,6 +40,14 @@ export default function App() {
     setActiveScreen(screen)
   }, [])
 
+  const handleLogout = useCallback(() => {
+    setAuthenticated(false)
+    setActiveScreen('inicio')
+    setGuide(null)
+    setExternalPhase(0)
+    setTrainingProgress(createEmptyTrainingProgress())
+  }, [])
+
   const startHowTo = useCallback((howtoId) => {
     if (!HOW_TO_TUTORIALS[howtoId]) return
     if (EXTERNAL_TUTORIALS[howtoId]) {
@@ -110,7 +118,11 @@ export default function App() {
 
   return (
     <div className="flex h-full min-h-screen bg-surface">
-      <Sidebar activeScreen={activeScreen} onNavigate={setActiveScreen} />
+      <Sidebar
+        activeScreen={activeScreen}
+        onNavigate={setActiveScreen}
+        onLogout={handleLogout}
+      />
       <div className="ml-sidebar flex min-h-screen flex-1 flex-col">
         <Topbar activeScreen={activeScreen} />
         <main className="flex-1 overflow-hidden">
